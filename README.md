@@ -6,6 +6,8 @@ It passes the `go test` output verbatim on STDERR and the CSV output to STDOUT.
 
 ## Usage
 
+![demo.gif](docs%2Fdemo.gif)
+
 ```shell
 $ go install ./cmd/bench2csv
 $ go test -cpu 1,2,4,8 -bench . | bench2csv >benchmark.csv
