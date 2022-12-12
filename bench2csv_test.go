@@ -13,13 +13,25 @@ import (
 var testdata embed.FS
 
 func TestProcess(t *testing.T) {
-	t.Run("outputs CSV with name,parallelism,ops,duration", func(t *testing.T) {
+	t.Run("outputs CSV with name,parallelism,operations,duration", func(t *testing.T) {
 		var csv strings.Builder
 
-		err := bench2csv.Process(strings.NewReader(readFile(t, "input1.txt")), &csv, io.Discard)
+		err := bench2csv.Process(strings.NewReader(readFile(t, "input1.txt")), &csv, io.Discard, bench2csv.Default)
 		noErr(t, err)
 
 		if csv.String() != readFile(t, "output1.csv") {
+			t.Fatal("Unexpected output:", csv.String())
+		}
+	})
+
+	t.Run("outputs CSV with frequency if set", func(t *testing.T) {
+		var csv strings.Builder
+
+		err := bench2csv.Process(strings.NewReader(readFile(t, "input1.txt")), &csv, io.Discard,
+			bench2csv.Default|bench2csv.Frequency)
+		noErr(t, err)
+
+		if csv.String() != readFile(t, "output2.csv") {
 			t.Fatal("Unexpected output:", csv.String())
 		}
 	})
@@ -29,7 +41,7 @@ func TestProcess(t *testing.T) {
 
 		var out strings.Builder
 
-		err := bench2csv.Process(strings.NewReader(input), io.Discard, &out)
+		err := bench2csv.Process(strings.NewReader(input), io.Discard, &out, bench2csv.Default)
 		noErr(t, err)
 
 		if out.String() != input {
@@ -46,7 +58,7 @@ func BenchmarkProcess(b *testing.B) {
 
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
-				err := bench2csv.Process(strings.NewReader(input), io.Discard, io.Discard)
+				err := bench2csv.Process(strings.NewReader(input), io.Discard, io.Discard, 0)
 				noErr(b, err)
 			}
 		})
