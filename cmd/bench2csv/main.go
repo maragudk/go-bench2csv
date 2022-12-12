@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -15,5 +16,15 @@ func main() {
 }
 
 func start() error {
-	return bench2csv.Process(os.Stdin, os.Stdout, os.Stderr)
+	format := bench2csv.Default
+
+	freq := flag.Bool("freq", false, "Include frequency output")
+
+	flag.Parse()
+
+	if *freq {
+		format |= bench2csv.Frequency
+	}
+
+	return bench2csv.Process(os.Stdin, os.Stdout, os.Stderr, format)
 }

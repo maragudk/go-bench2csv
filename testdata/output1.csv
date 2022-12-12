@@ -1,4 +1,4 @@
-name,parallelism,ops,duration
+name,parallelism,operations,duration
 Select1,1,846847,1409
 Select1,2,1468395,811.9
 Select1,4,2667094,451.0

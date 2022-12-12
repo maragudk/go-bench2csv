@@ -5,7 +5,17 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"strconv"
 	"strings"
+)
+
+const (
+	Name = 1 << iota
+	Parallelism
+	Operations
+	Duration
+	Frequency
+	Default = Name | Parallelism | Operations | Duration
 )
 
 // benchmakrMatcher matches a benchmark output line.
@@ -22,10 +32,27 @@ var benchmarkMatcher = regexp.MustCompile(
 		`$`)
 
 // Process benchmark output from in, write CSV to csvOut, and pipe benchmark output to errOut.
-func Process(in io.Reader, csvOut, errOut io.Writer) error {
+func Process(in io.Reader, csvOut, errOut io.Writer, format int) error {
 	s := bufio.NewScanner(in)
 
-	if _, err := fmt.Fprintln(csvOut, "name,parallelism,ops,duration"); err != nil {
+	var header []string
+	if format&Name != 0 {
+		header = append(header, "name")
+	}
+	if format&Parallelism != 0 {
+		header = append(header, "parallelism")
+	}
+	if format&Operations != 0 {
+		header = append(header, "operations")
+	}
+	if format&Duration != 0 {
+		header = append(header, "duration")
+	}
+	if format&Frequency != 0 {
+		header = append(header, "frequency")
+	}
+
+	if _, err := fmt.Fprintln(csvOut, strings.Join(header, ",")); err != nil {
 		return err
 	}
 
@@ -44,14 +71,37 @@ func Process(in io.Reader, csvOut, errOut io.Writer) error {
 
 		name := submatches[0]
 		parallelism := submatches[1]
-		ops := submatches[2]
+		operations := submatches[2]
 		duration := submatches[3]
 
 		if parallelism == "" {
 			parallelism = "1"
 		}
 
-		if _, err := fmt.Fprintln(csvOut, strings.Join([]string{name, parallelism, ops, duration}, ",")); err != nil {
+		durationAsFloat, err := strconv.ParseFloat(duration, 64)
+		if err != nil {
+			return err
+		}
+		frequency := strconv.FormatFloat(1e9/durationAsFloat, 'f', -1, 64)
+
+		var values []string
+		if format&Name != 0 {
+			values = append(values, name)
+		}
+		if format&Parallelism != 0 {
+			values = append(values, parallelism)
+		}
+		if format&Operations != 0 {
+			values = append(values, operations)
+		}
+		if format&Duration != 0 {
+			values = append(values, duration)
+		}
+		if format&Frequency != 0 {
+			values = append(values, frequency)
+		}
+
+		if _, err := fmt.Fprintln(csvOut, strings.Join(values, ",")); err != nil {
 			return err
 		}
 	}
