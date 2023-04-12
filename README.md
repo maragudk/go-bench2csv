@@ -9,7 +9,7 @@ It passes the `go test` output verbatim on STDERR and the CSV output to STDOUT.
 ![demo.gif](docs%2Fdemo.gif)
 
 ```shell
-$ go install ./cmd/bench2csv
+$ go install github.com/maragudk/go-bench2csv/cmd/bench2csv@latest
 $ go test -cpu 1,2,4,8 -bench . | bench2csv >benchmark.csv
 goos: darwin
 goarch: arm64
