@@ -36,6 +36,18 @@ func TestProcess(t *testing.T) {
 		}
 	})
 
+	t.Run("outputs CSV with benchmem statistics if set", func(t *testing.T) {
+		var csv strings.Builder
+
+		err := bench2csv.Process(strings.NewReader(readFile(t, "input2.txt")), &csv, io.Discard,
+			bench2csv.Default|bench2csv.Mem)
+		noErr(t, err)
+
+		if csv.String() != readFile(t, "output3.csv") {
+			t.Fatal("Unexpected output:", csv.String())
+		}
+	})
+
 	t.Run("pipes input to output", func(t *testing.T) {
 		input := readFile(t, "input1.txt")
 
