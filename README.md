@@ -1,5 +1,8 @@
 # go-bench2csv
 
+[![GoDoc](https://pkg.go.dev/badge/github.com/maragudk/go-bench2csv)](https://pkg.go.dev/github.com/maragudk/go-bench2csv)
+[![Go](https://github.com/maragudk/go-bench2csv/actions/workflows/ci.yml/badge.svg)](https://github.com/maragudk/go-bench2csv/actions/workflows/ci.yml)
+
 A small CLI to parse the output of `go test -bench` and output to CSV.
 
 It passes the `go test` output verbatim on STDERR and the CSV output to STDOUT.
