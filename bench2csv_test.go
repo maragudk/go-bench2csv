@@ -40,10 +40,22 @@ func TestProcess(t *testing.T) {
 		var csv strings.Builder
 
 		err := bench2csv.Process(strings.NewReader(readFile(t, "input2.txt")), &csv, io.Discard,
-			bench2csv.Default|bench2csv.Mem)
+			bench2csv.Default|bench2csv.Memory)
 		noErr(t, err)
 
 		if csv.String() != readFile(t, "output3.csv") {
+			t.Fatal("Unexpected output:", csv.String())
+		}
+	})
+
+	t.Run("outputs CSV with benchmem statistics and frequency if set", func(t *testing.T) {
+		var csv strings.Builder
+
+		err := bench2csv.Process(strings.NewReader(readFile(t, "input2.txt")), &csv, io.Discard,
+			bench2csv.Default|bench2csv.Frequency|bench2csv.Memory)
+		noErr(t, err)
+
+		if csv.String() != readFile(t, "output4.csv") {
 			t.Fatal("Unexpected output:", csv.String())
 		}
 	})

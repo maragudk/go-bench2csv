@@ -18,11 +18,11 @@ const (
 	BytesPerOp
 	AllocsPerOp
 	Default = Name | Parallelism | Operations | Duration
-	Mem     = BytesPerOp | AllocsPerOp
+	Memory  = BytesPerOp | AllocsPerOp
 )
 
 // benchmarkMatcher matches a benchmark output line.
-// See https://regex101.com/r/Uv4LNN/latest
+// See https://regex101.com/r/EEQMWQ/latest
 var benchmarkMatcher = regexp.MustCompile(
 	`^Benchmark` + // "Benchmark" prefix
 		`(?P<name>[^-\s]+)` + // Name
@@ -39,7 +39,10 @@ var benchmarkMatcher = regexp.MustCompile(
 		`\sB/op\s+` + // Bytes per operation unit suffix
 		`(?P<allocsPerOp>\d+)` + // Allocs per operation
 		`\sallocs/op` + // Allocs per operation unit suffix
-		`)?$`)
+		`)?` +
+
+		// The end
+		`$`)
 
 // Process benchmark output from in, write CSV to csvOut, and pipe benchmark output to errOut.
 func Process(in io.Reader, csvOut, errOut io.Writer, format int) error {

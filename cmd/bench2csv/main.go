@@ -19,7 +19,7 @@ func start() error {
 	format := bench2csv.Default
 
 	freq := flag.Bool("freq", false, "Include frequency output")
-	mem := flag.Bool("mem", false, "Include -benchmem statistics output")
+	mem := flag.Bool("mem", false, "Include -benchmem output")
 
 	flag.Parse()
 
@@ -28,7 +28,7 @@ func start() error {
 	}
 
 	if *mem {
-		format |= bench2csv.Mem
+		format |= bench2csv.Memory
 	}
 
 	return bench2csv.Process(os.Stdin, os.Stdout, os.Stderr, format)
