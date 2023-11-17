@@ -15,11 +15,14 @@ const (
 	Operations
 	Duration
 	Frequency
+	BytesPerOp
+	AllocsPerOp
 	Default = Name | Parallelism | Operations | Duration
+	Memory  = BytesPerOp | AllocsPerOp
 )
 
-// benchmakrMatcher matches a benchmark output line.
-// See https://regex101.com/r/Uv4LNN/latest
+// benchmarkMatcher matches a benchmark output line.
+// See https://regex101.com/r/EEQMWQ/latest
 var benchmarkMatcher = regexp.MustCompile(
 	`^Benchmark` + // "Benchmark" prefix
 		`(?P<name>[^-\s]+)` + // Name
@@ -29,6 +32,16 @@ var benchmarkMatcher = regexp.MustCompile(
 		`\s+` +
 		`(?P<duration>\d+(?:\.\d+)?)` + // Duration for each operation
 		`\sns/op` + // Duration unit suffix
+
+		// Optionally, with -benchmem...
+		`(\s+` +
+		`(?P<bytesPerOp>\d+)` + // Bytes per operation
+		`\sB/op\s+` + // Bytes per operation unit suffix
+		`(?P<allocsPerOp>\d+)` + // Allocs per operation
+		`\sallocs/op` + // Allocs per operation unit suffix
+		`)?` +
+
+		// The end
 		`$`)
 
 // Process benchmark output from in, write CSV to csvOut, and pipe benchmark output to errOut.
@@ -50,6 +63,12 @@ func Process(in io.Reader, csvOut, errOut io.Writer, format int) error {
 	}
 	if format&Frequency != 0 {
 		header = append(header, "frequency")
+	}
+	if format&BytesPerOp != 0 {
+		header = append(header, "bytes_per_op")
+	}
+	if format&AllocsPerOp != 0 {
+		header = append(header, "allocs_per_op")
 	}
 
 	if _, err := fmt.Fprintln(csvOut, strings.Join(header, ",")); err != nil {
@@ -73,6 +92,13 @@ func Process(in io.Reader, csvOut, errOut io.Writer, format int) error {
 		parallelism := submatches[1]
 		operations := submatches[2]
 		duration := submatches[3]
+
+		bytesPerOp := "0"
+		allocsPerOp := "0"
+		if len(submatches) > 6 {
+			bytesPerOp = submatches[5]
+			allocsPerOp = submatches[6]
+		}
 
 		if parallelism == "" {
 			parallelism = "1"
@@ -99,6 +125,12 @@ func Process(in io.Reader, csvOut, errOut io.Writer, format int) error {
 		}
 		if format&Frequency != 0 {
 			values = append(values, frequency)
+		}
+		if format&BytesPerOp != 0 {
+			values = append(values, bytesPerOp)
+		}
+		if format&AllocsPerOp != 0 {
+			values = append(values, allocsPerOp)
 		}
 
 		if _, err := fmt.Fprintln(csvOut, strings.Join(values, ",")); err != nil {

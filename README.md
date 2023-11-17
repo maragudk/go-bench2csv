@@ -22,4 +22,19 @@ PASS
 ok  	github.com/maragudk/go-bench2csv	7.324s
 ```
 
+Also works with `go test -benchmem`:
+
+```shell
+$ go test -cpu 1,2,4,8 -bench . -benchmem | bench2csv -mem >benchmark.csv
+goos: darwin
+goarch: arm64
+pkg: github.com/maragudk/go-bench2csv
+BenchmarkProcess/in_parallel_just_for_fun           	    4106	    292497 ns/op	   53892 B/op	     738 allocs/op
+BenchmarkProcess/in_parallel_just_for_fun-2         	    7929	    151227 ns/op	   53897 B/op	     738 allocs/op
+BenchmarkProcess/in_parallel_just_for_fun-4         	   15013	     79910 ns/op	   53909 B/op	     738 allocs/op
+BenchmarkProcess/in_parallel_just_for_fun-8         	   18214	     66196 ns/op	   53941 B/op	     738 allocs/op
+PASS
+ok  	github.com/maragudk/go-bench2csv	7.402s
+```
+
 Made in 🇩🇰 by [maragu](https://www.maragu.dk/), maker of [online Go courses](https://www.golang.dk/).
